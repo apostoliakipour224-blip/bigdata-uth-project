@@ -1,0 +1,9 @@
+{
+    "dataset": "yellow_tripdata_2024",
+    "raw_rows": 41169720,
+    "processed_rows": 41169664,
+    "dropped_rows": 56,
+    "conversion_time_seconds": 1795.81,
+    "partition_column": "pickup_day",
+    "output_path": "hdfs://hdfs-namenode.default.svc.cluster.local:9000/user/akipouridou/project2026/data/parquet/yellow_tripdata_2024"
+}
