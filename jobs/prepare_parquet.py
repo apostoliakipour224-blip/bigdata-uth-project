@@ -36,7 +36,7 @@ def main():
     # Το output_path παίρνει το HADOOP_USER_NAME αυτόματα από το περιβάλλον σου
     import os
     username = os.environ.get("HADOOP_USER_NAME", "root")
-    output_parquet = f"hdfs://hdfs-namenode.default.svc.cluster.local:9000/user/{username}/project2026/data/parquet/yellow_tripdata_2024"
+    output_parquet = f"hdfs://hdfs-namenode.default.svc.cluster.local:9000/user/akipouridou/project2026/data/parquet/yellow_tripdata_2015"
 
     start_time = time.time()
 
