@@ -3,27 +3,18 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, hour, unix_timestamp, round, radians, sin, cos, atan2, sqrt, pow, mean
 
 def main():
-    # 1. Αρχικοποίηση του Spark
-    spark = SparkSession.builder.appName("Q2_DataFrame_Builtins").getOrCreate()
-
-    # Φόρτωση του Parquet
-        df = spark.read.parquet(data_path)
-        
-        # ΠΡΟΣΘΕΣΕ ΑΥΤΟ:
-        print("ΟΙ ΣΤΗΛΕΣ ΠΟΥ ΒΡΗΚΑ ΕΙΝΑΙ:")
-        print(df.columns) 
-        
+    spark = SparkSession.builder.appName("Q2_DataFrame_Builtins_Final").getOrCreate()
     
-    # 2. Το ΣΩΣΤΟ μονοπάτι για τα δεδομένα του 2024
-    data_path = "hdfs://hdfs-namenode.default.svc.cluster.local:9000/user/akipouridou/project2026/data/parquet/yellow_tripdata_2024"
+    # ΤΟ ΣΩΣΤΟ ΚΑΙ ΕΠΙΒΕΒΑΙΩΜΕΝΟ PATH!
+    data_path = "hdfs://hdfs-namenode.default.svc.cluster.local:9000/data/yellow_tripdata_2015.csv"
     
     start_time = time.time()
     print("\n" + "="*50)
     print("=== ΞΕΚΙΝΑΕΙ Η ΦΟΡΤΩΣΗ ΤΩΝ ΔΕΔΟΜΕΝΩΝ ΤΟΥ 2015 ===")
     
     try:
-        # Φόρτωση του Parquet
-        df = spark.read.parquet(data_path)
+        # Φόρτωση του CSV (όχι Parquet πλέον!)
+        df = spark.read.csv(data_path, header=True, inferSchema=True)
         print("Τα δεδομένα φορτώθηκαν με επιτυχία!")
         
         # 1. Φιλτράρισμα Έγκυρων Εγγραφών (Καθαρισμός)
@@ -99,10 +90,10 @@ def main():
         slowest_trips.show()
 
     except Exception as e:
-        print("ΣΦΑΛΜΑ:", str(e))
+        print("\nΣΦΑΛΜΑ ΚΑΤΑ ΤΗΝ ΕΚΤΕΛΕΣΗ:", str(e))
         
     end_time = time.time()
-    print("="*50)
+    print("\n" + "="*50)
     print(f"Συνολικός χρόνος εκτέλεσης: {end_time - start_time} δευτερόλεπτα")
     print("="*50 + "\n")
     
