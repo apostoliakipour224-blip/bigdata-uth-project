@@ -1,0 +1,78 @@
+(1) InMemoryTableScan                                                                                                                                                           │
+│ Output [13]: [Airport_fee#2956, congestion_surcharge#2955, extra#2949, fare_amount#2948, improvement_surcharge#2953, mta_tax#2950, pu_location_id#2945, tip_amount#2951, tolls_ │
+│ Arguments: [Airport_fee#2956, congestion_surcharge#2955, extra#2949, fare_amount#2948, improvement_surcharge#2953, mta_tax#2950, pu_location_id#2945, tip_amount#2951, tolls_am │
+│                                                                                                                                                                                 │
+│ (2) InMemoryRelation                                                                                                                                                            │
+│ Arguments: [vendor_id#2938, tpep_pickup_datetime#2939, tpep_dropoff_datetime#2940, passenger_count#2941, trip_distance#2942, RatecodeID#2943, store_and_fwd_flag#2944, pu_locat │
+│ +- *(1) ColumnarToRow                                                                                                                                                           │
+│    +- FileScan parquet [vendor_id#0,tpep_pickup_datetime#1,tpep_dropoff_datetime#2,passenger_count#3,trip_distance#4,RatecodeID#5,store_and_fwd_flag#6,pu_location_id#7,do_loca │
+│ ,None)                                                                                                                                                                          │
+│                                                                                                                                                                                 │
+│ (3) Scan parquet                                                                                                                                                                │
+│ Output [26]: [vendor_id#0, tpep_pickup_datetime#1, tpep_dropoff_datetime#2, passenger_count#3, trip_distance#4, RatecodeID#5, store_and_fwd_flag#6, pu_location_id#7, do_locati │
+│ Batched: true                                                                                                                                                                   │
+│ Location: InMemoryFileIndex [hdfs://hdfs-namenode.default.svc.cluster.local:9000/user/akipouridou/project2026/data/parquet/yellow_tripdata_2024]                                │
+│ ReadSchema: struct<vendor_id:int,tpep_pickup_datetime:string,tpep_dropoff_datetime:string,passenger_count:int,trip_distance:double,RatecodeID:int,store_and_fwd_flag:string,pu_ │
+│                                                                                                                                                                                 │
+│ (4) ColumnarToRow [codegen id : 1]                                                                                                                                              │
+│ Input [26]: [vendor_id#0, tpep_pickup_datetime#1, tpep_dropoff_datetime#2, passenger_count#3, trip_distance#4, RatecodeID#5, store_and_fwd_flag#6, pu_location_id#7, do_locatio │
+│                                                                                                                                                                                 │
+│ (5) CollectLimit                                                                                                                                                                │
+│ Input [26]: [vendor_id#0, tpep_pickup_datetime#1, tpep_dropoff_datetime#2, passenger_count#3, trip_distance#4, RatecodeID#5, store_and_fwd_flag#6, pu_location_id#7, do_locatio │
+│ Arguments: 100000                                                                                                                                                               │
+│                                                                                                                                                                                 │
+│ (6) Filter                                                                                                                                                                      │
+│ Input [13]: [Airport_fee#2956, congestion_surcharge#2955, extra#2949, fare_amount#2948, improvement_surcharge#2953, mta_tax#2950, pu_location_id#2945, tip_amount#2951, tolls_a │
+│ Condition : (((((((isnotnull(trip_distance#2942) AND isnotnull(fare_amount#2948)) AND isnotnull(total_amount#2954)) AND (trip_distance#2942 > 0.0)) AND (fare_amount#2948 > 0.0 │
+│                                                                                                                                                                                 │
+│ (7) Project                                                                                                                                                                     │
+│ Output [12]: [trip_distance#2942, pu_location_id#2945, fare_amount#2948, extra#2949, mta_tax#2950, tip_amount#2951, tolls_amount#2952, improvement_surcharge#2953, total_amount │
+│ Input [13]: [Airport_fee#2956, congestion_surcharge#2955, extra#2949, fare_amount#2948, improvement_surcharge#2953, mta_tax#2950, pu_location_id#2945, tip_amount#2951, tolls_a │
+│                                                                                                                                                                                 │
+│ (8) Scan csv                                                                                                                                                                    │
+│ Output [3]: [LocationID#199, Borough#200, Zone#201]                                                                                                                             │
+│ Batched: false                                                                                                                                                                  │
+│ Location: InMemoryFileIndex [hdfs://hdfs-namenode.default.svc.cluster.local:9000/data/taxi_zone_lookup.csv]                                                                     │
+│ PushedFilters: [IsNotNull(LocationID)]                                                                                                                                          │
+│ ReadSchema: struct<LocationID:int,Borough:string,Zone:string>        
+|  (9) Filter                                                                                                                                                                      │
+│ Input [3]: [LocationID#199, Borough#200, Zone#201]                                                                                                                              │
+│ Condition : isnotnull(LocationID#199)                                                                                                                                           │
+│                                                                                                                                                                                 │
+│ (10) BroadcastExchange                                                                                                                                                          │
+│ Input [3]: [LocationID#199, Borough#200, Zone#201]                                                                                                                              │
+│ Arguments: HashedRelationBroadcastMode(List(cast(input[0, int, false] as bigint)),false), [plan_id=458]                                                                         │
+│                                                                                                                                                                                 │
+│ (11) BroadcastHashJoin                                                                                                                                                          │
+│ Left keys [1]: [pu_location_id#2945]                                                                                                                                            │
+│ Right keys [1]: [LocationID#199]                                                                                                                                                │
+│ Join type: Inner                                                                                                                                                                │
+│ Join condition: None                                                                                                                                                            │
+│                                                                                                                                                                                 │
+│ (12) Project                                                                                                                                                                    │
+│ Output [9]: [trip_distance#2942, fare_amount#2948, tip_amount#2951, total_amount#2954, calc_duration#246, Borough#200 AS pickup_borough#208, Zone#201 AS pickup_zone#209, CASE  │
+│ Input [15]: [trip_distance#2942, pu_location_id#2945, fare_amount#2948, extra#2949, mta_tax#2950, tip_amount#2951, tolls_amount#2952, improvement_surcharge#2953, total_amount# │
+│                                                                                                                                                                                 │
+│ (13) HashAggregate                                                                                                                                                              │
+│ Input [9]: [trip_distance#2942, fare_amount#2948, tip_amount#2951, total_amount#2954, calc_duration#246, pickup_borough#208, pickup_zone#209, distance_bucket#210, total_surcha │
+│ Keys [3]: [pickup_borough#208, pickup_zone#209, distance_bucket#210]                                                                                                            │
+│ Functions [8]: [partial_count(total_amount#2954), partial_sum(total_amount#2954), partial_avg(total_amount#2954), partial_sum(trip_distance#2942), partial_sum(calc_duration#24 │
+│ Aggregate Attributes [12]: [count#3225L, sum#3226, sum#3227, count#3228L, sum#3229, sum#2533, isEmpty#2534, sum#3230, count#3231L, sum#3232, count#3233L, sum#3234]             │
+│ Results [15]: [pickup_borough#208, pickup_zone#209, distance_bucket#210, count#3235L, sum#3236, sum#3237, count#3238L, sum#3239, sum#2537, isEmpty#2538, sum#3240, count#3241L, │
+│                                                                                                                                                                                 │
+│ (14) HashAggregate                                                                                                                                                              │
+│ Input [15]: [pickup_borough#208, pickup_zone#209, distance_bucket#210, count#3235L, sum#3236, sum#3237, count#3238L, sum#3239, sum#2537, isEmpty#2538, sum#3240, count#3241L, s │
+│ Keys [3]: [pickup_borough#208, pickup_zone#209, distance_bucket#210]                                                                                                            │
+│ Functions [8]: [count(total_amount#2954), sum(total_amount#2954), avg(total_amount#2954), sum(trip_distance#2942), sum(calc_duration#246), avg(fare_amount#2948), avg(tip_amoun │
+│ Aggregate Attributes [8]: [count(total_amount#2954)#247L, sum(total_amount#2954)#248, avg(total_amount#2954)#249, sum(trip_distance#2942)#251, sum(calc_duration#246)#253, avg( │
+│ Results [11]: [pickup_borough#208, pickup_zone#209, distance_bucket#210, count(total_amount#2954)#247L AS trips#212L, sum(total_amount#2954)#248 AS total_revenue#213, avg(tota │
+│                                                                                                                                                                                 │
+│ (15) AdaptiveSparkPlan                                                                                                                                                          │
+│ Output [11]: [pickup_borough#208, pickup_zone#209, distance_bucket#210, trips#212L, total_revenue#213, avg_revenue_per_trip#214, revenue_per_mile#215, revenue_per_minute#216,  │
+│ Arguments: isFinalPlan=false                                                                                                                                                    │
+│                                                                                                                                                                                 │
+│                                                                                                                                                                                 │
+│                                                                                                                                                                                 │
+│ ==================================================                                                                                                                              │
+│ Συνολικός χρόνος εκτέλεσης (Parquet - SQL): 48.452768087387085 δευτερόλεπτα
+==================================================  
