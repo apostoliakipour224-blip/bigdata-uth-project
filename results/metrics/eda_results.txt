@@ -1,0 +1,119 @@
+[BΗΜΑ 1] Εκκίνηση Spark Session...
+
+
+==================================================
+=== ΞΕΚΙΝΑΕΙ Η ΔΙΕΡΕΥΝΗΤΙΚΗ ΑΝΑΛΥΣΗ (EDA) ===
+==================================================
+
+
+[ΤΕΚΜΗΡΙΟ 1] Schema 2024:
+root
+ |-- vendor_id: integer (nullable = true)
+ |-- tpep_pickup_datetime: string (nullable = true)
+ |-- tpep_dropoff_datetime: string (nullable = true)
+ |-- passenger_count: integer (nullable = true)
+ |-- trip_distance: double (nullable = true)
+ |-- RatecodeID: integer (nullable = true)
+ |-- store_and_fwd_flag: string (nullable = true)
+ |-- pu_location_id: integer (nullable = true)
+ |-- do_location_id: integer (nullable = true)
+ |-- payment_type: integer (nullable = true)
+ |-- fare_amount: double (nullable = true)
+ |-- extra: double (nullable = true)
+ |-- mta_tax: double (nullable = true)
+ |-- tip_amount: double (nullable = true)
+ |-- tolls_amount: double (nullable = true)
+ |-- improvement_surcharge: double (nullable = true)
+ |-- total_amount: double (nullable = true)
+ |-- congestion_surcharge: double (nullable = true)
+ |-- Airport_fee: double (nullable = true)
+ |-- pickup_ts: timestamp (nullable = true)
+ |-- dropoff_ts: timestamp (nullable = true)
+ |-- pickup_date: date (nullable = true)
+ |-- pickup_hour: integer (nullable = true)
+ |-- duration_minutes: double (nullable = true)
+ |-- trip_distance_km: double (nullable = true)
+ |-- pickup_day: integer (nullable = true)
+
+
+[ΤΕΚΜΗΡΙΟ 1] Στατιστικά (Describe) για Απόσταση και Χρέωση:
+
++-------+------------------+-----------------+
+|summary|     trip_distance|     total_amount|
++-------+------------------+-----------------+
+|  count|          41169664|         41169664|
+|   mean| 4.976098943629552|27.83279580956278|
+| stddev|419.23078239649215|78.05363010278847|
+|    min|               0.0|         -2265.45|
+|    max|         398608.62|        335550.94|
++-------+------------------+-----------------+
+
+
+[ΤΕΚΜΗΡΙΟ 2] Υπολογισμός Nulls 2024...
+
+-RECORD 0------------------------
+ vendor_id             | 0       
+ tpep_pickup_datetime  | 0       
+ tpep_dropoff_datetime | 0       
+ passenger_count       | 4091232 
+ trip_distance         | 0       
+ RatecodeID            | 4091232 
+ store_and_fwd_flag    | 4091232 
+ pu_location_id        | 0       
+ do_location_id        | 0       
+ payment_type          | 0       
+ fare_amount           | 0       
+ extra                 | 0       
+ mta_tax               | 0       
+ tip_amount            | 0       
+ tolls_amount          | 0       
+ improvement_surcharge | 0       
+ total_amount          | 0       
+ congestion_surcharge  | 4091232 
+ Airport_fee           | 4091232 
+ pickup_ts             | 0       
+ dropoff_ts            | 0       
+ pickup_date           | 0       
+ pickup_hour           | 0       
+ duration_minutes      | 0       
+ trip_distance_km      | 0       
+ pickup_day            | 0       
+
+
+[ΤΕΚΜΗΡΙΟ 8] Top 10 Περιοχές Επιβίβασης (Zones):
+
++----------------------------+-------+
+|Zone                        |count  |
++----------------------------+-------+
+|JFK Airport                 |1989986|
+|Upper East Side South       |1915438|
+|Midtown Center              |1914605|
+|Upper East Side North       |1729895|
+|Midtown East                |1418846|
+|Times Sq/Theatre District   |1391157|
+|Penn Station/Madison Sq West|1362156|
+|Lincoln Square East         |1314690|
+|LaGuardia Airport           |1295499|
+|Murray Hill                 |1176580|
++----------------------------+-------+
+
+
+[ΤΕΚΜΗΡΙΟ 9] Ακραίες Εγγραφές (Ανωμαλίες):
+
+Μεγαλύτερη Απόσταση:
+
++-------------+------------+
+|trip_distance|total_amount|
++-------------+------------+
+|    398608.62|       26.04|
++-------------+------------+
+
+Πιο αρνητική χρέωση (Refunds):
++------------+-------------+
+|total_amount|trip_distance|
++------------+-------------+
+|    -2265.45|        63.38|
++------------+-------------+
+
+
+=== Η EDA ΟΛΟΚΛΗΡΩΘΗΚΕ ΕΠΙΤΥΧΩΣ! ===
