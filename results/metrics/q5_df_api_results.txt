@@ -39,3 +39,74 @@ AdaptiveSparkPlan isFinalPlan=true
 +- *(9) SortMergeJoin [do_location_id#8], [do_id#85], Inner
 ...
 +- *(6) SortMergeJoin [pu_location_id#7], [pu_id#78], Inner
+
+Χρόνος εκτέλεσης με Sort-Merge Join: 204.06 δευτερόλεπτα                                                                                                                                                 │
+│                                                                                                                                                                                                          │
+│ --- ΦΥΣΙΚΟ ΣΧΕΔΙΟ (SORT-MERGE JOIN) ---                                                                                                                                                                  │
+│ == Physical Plan ==                                                                                                                                                                                      │
+│ AdaptiveSparkPlan isFinalPlan=true                                                                                                                                                                       │
+│ +- == Final Plan ==                                                                                                                                                                                      │
+│    *(11) Sort [trips#625L DESC NULLS LAST], true, 0                                                                                                                                                      │
+│    +- AQEShuffleRead coalesced                                                                                                                                                                           │
+│       +- ShuffleQueryStage 6                                                                                                                                                                             │
+│          +- Exchange rangepartitioning(trips#625L DESC NULLS LAST, 200), ENSURE_REQUIREMENTS, [plan_id=996]                                                                                              │
+│             +- *(10) HashAggregate(keys=[pu_borough#79, do_borough#86], functions=[count(1)])                                                                                                            │
+│                +- AQEShuffleRead coalesced                                                                                                                                                               │
+│                   +- ShuffleQueryStage 5                                                                                                                                                                 │
+│                      +- Exchange hashpartitioning(pu_borough#79, do_borough#86, 200), ENSURE_REQUIREMENTS, [plan_id=954]                                                                                 │
+│                         +- *(9) HashAggregate(keys=[pu_borough#79, do_borough#86], functions=[partial_count(1)])                                                                                         │
+│                            +- *(9) Project [pu_borough#79, do_borough#86]                                                                                                                                │
+│                               +- *(9) SortMergeJoin [do_location_id#8], [do_id#85], Inner                                                                                                                │
+│                                  :- *(7) Sort [do_location_id#8 ASC NULLS FIRST], false, 0                                                                                                               │
+│                                  :  +- AQEShuffleRead coalesced                                                                                                                                          │
+│                                  :     +- ShuffleQueryStage 4                                                                                                                                            │
+│                                  :        +- Exchange hashpartitioning(do_location_id#8, 200), ENSURE_REQUIREMENTS, [plan_id=833]                                                                        │
+│                                  :           +- *(6) Project [do_location_id#8, pu_borough#79]                                                                                                           │
+│                                  :              +- *(6) SortMergeJoin [pu_location_id#7], [pu_id#78], Inner                                                                                              │
+│                                  :                 :- *(4) Sort [pu_location_id#7 ASC NULLS FIRST], false, 0                                                                                             │
+│                                  :                 :  +- AQEShuffleRead coalesced                                                                                                                        │
+│                                  :                 :     +- ShuffleQueryStage 0                                                                                                                          │
+│                                  :                 :        +- Exchange hashpartitioning(pu_location_id#7, 200), ENSURE_REQUIREMENTS, [plan_id=646]                                                      │
+│                                  :                 :           +- *(1) Project [pu_location_id#7, do_location_id#8]                                                                                      │
+│                                  :                 :              +- *(1) Filter (((((((isnotnull(duration_minutes#23) AND isnotnull(trip_distance#4)) AND isnotnull(total_amount#16)) AND (duration_min │
+│                                  :                 :                 +- *(1) ColumnarToRow                                                                                                               │
+│                                  :                 :                    +- FileScan parquet [trip_distance#4,pu_location_id#7,do_location_id#8,total_amount#16,duration_minutes#23,pickup_day#25] Batche │
+│                                  :                 +- *(5) Sort [pu_id#78 ASC NULLS FIRST], false, 0                                                                                                     │
+│                                  :                    +- AQEShuffleRead coalesced                                                                                                                        │
+│                                  :                       +- ShuffleQueryStage 1                                                                                                                          │
+│                                  :                          +- Exchange hashpartitioning(pu_id#78, 200), ENSURE_REQUIREMENTS, [plan_id=662]
+ +- *(2) Project [LocationID#69 AS pu_id#78, Borough#70 AS pu_borough#79]                                                                  │
+│                                  :                                +- *(2) Filter isnotnull(LocationID#69)                                                                                                │
+│                                  :                                   +- FileScan csv [LocationID#69,Borough#70] Batched: false, DataFilters: [isnotnull(LocationID#69)], Format: CSV, Location: InMemory │
+│                                  +- *(8) Sort [do_id#85 ASC NULLS FIRST], false, 0                                                                                                                       │
+│                                     +- AQEShuffleRead coalesced                                                                                                                                          │
+│                                        +- ShuffleQueryStage 3                                                                                                                                            │
+│                                           +- ReusedExchange [do_id#85, do_borough#86], Exchange hashpartitioning(pu_id#78, 200), ENSURE_REQUIREMENTS, [plan_id=662]   
+ +- == Initial Plan ==                                                                                                                                                                                    │
+│    Sort [trips#625L DESC NULLS LAST], true, 0                                                                                                                                                            │
+│    +- Exchange rangepartitioning(trips#625L DESC NULLS LAST, 200), ENSURE_REQUIREMENTS, [plan_id=588]                                                                                                    │
+│       +- HashAggregate(keys=[pu_borough#79, do_borough#86], functions=[count(1)])                                                                                                                        │
+│          +- Exchange hashpartitioning(pu_borough#79, do_borough#86, 200), ENSURE_REQUIREMENTS, [plan_id=585]                                                                                             │
+│             +- HashAggregate(keys=[pu_borough#79, do_borough#86], functions=[partial_count(1)])                                                                                                          │
+│                +- Project [pu_borough#79, do_borough#86]                                                                                                                                                 │
+│                   +- SortMergeJoin [do_location_id#8], [do_id#85], Inner                                                                                                                                 │
+│                      :- Sort [do_location_id#8 ASC NULLS FIRST], false, 0                                                                                                                                │
+│                      :  +- Exchange hashpartitioning(do_location_id#8, 200), ENSURE_REQUIREMENTS, [plan_id=577]                                                                                          │
+│                      :     +- Project [do_location_id#8, pu_borough#79]                                                                                                                                  │
+│                      :        +- SortMergeJoin [pu_location_id#7], [pu_id#78], Inner                                                                                                                     │
+│                      :           :- Sort [pu_location_id#7 ASC NULLS FIRST], false, 0                                                                                                                    │
+│                      :           :  +- Exchange hashpartitioning(pu_location_id#7, 200), ENSURE_REQUIREMENTS, [plan_id=569]                                                                              │
+│                      :           :     +- Project [pu_location_id#7, do_location_id#8]                                                                                                                   │
+│                      :           :        +- Filter (((((((isnotnull(duration_minutes#23) AND isnotnull(trip_distance#4)) AND isnotnull(total_amount#16)) AND (duration_minutes#23 > 0.0)) AND (trip_dis │
+│                      :           :           +- FileScan parquet [trip_distance#4,pu_location_id#7,do_location_id#8,total_amount#16,duration_minutes#23,pickup_day#25] Batched: true, DataFilters: [isno │
+│                      :           +- Sort [pu_id#78 ASC NULLS FIRST], false, 0                                                                                                                            │
+│                      :              +- Exchange hashpartitioning(pu_id#78, 200), ENSURE_REQUIREMENTS, [plan_id=570]                                                                                      │
+│                      :                 +- Project [LocationID#69 AS pu_id#78, Borough#70 AS pu_borough#79]                                                                                               │
+│                      :                    +- Filter isnotnull(LocationID#69)                                                                                                                             │
+│                      :                       +- FileScan csv [LocationID#69,Borough#70] Batched: false, DataFilters: [isnotnull(LocationID#69)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs: │
+│                      +- Sort [do_id#85 ASC NULLS FIRST], false, 0                                                                                                                                        │
+│                         +- Exchange hashpartitioning(do_id#85, 200), ENSURE_REQUIREMENTS, [plan_id=578]                                                                                                  │
+│                            +- Project [LocationID#488 AS do_id#85, Borough#489 AS do_borough#86]                                                                                                         │
+│                               +- Filter isnotnull(LocationID#488)                                                                                                                                        │
+│                                  +- FileScan csv [LocationID#488,Borough#489] Batched: false, DataFilters: [isnotnull(LocationID#488)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://hdfs-na │
+│                                                                                                                                                                                                                                            │
